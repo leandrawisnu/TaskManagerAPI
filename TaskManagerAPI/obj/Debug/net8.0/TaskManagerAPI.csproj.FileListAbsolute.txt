@@ -171,3 +171,4 @@ D:\Pelatihan LKS\Bootcamp\TaskManagerAPI\TaskManagerAPI\obj\Debug\net8.0\refint\
 D:\Pelatihan LKS\Bootcamp\TaskManagerAPI\TaskManagerAPI\obj\Debug\net8.0\TaskManagerAPI.pdb
 D:\Pelatihan LKS\Bootcamp\TaskManagerAPI\TaskManagerAPI\obj\Debug\net8.0\TaskManagerAPI.genruntimeconfig.cache
 D:\Pelatihan LKS\Bootcamp\TaskManagerAPI\TaskManagerAPI\obj\Debug\net8.0\ref\TaskManagerAPI.dll
+D:\Pelatihan LKS\Bootcamp\TaskManagerAPI\TaskManagerAPI\obj\Debug\net8.0\TaskManagerAPI.sourcelink.json

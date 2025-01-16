@@ -30,7 +30,7 @@ namespace TaskManagerAPI.Controllers
             int userId = GetUserID();
 
             var data = _context.Tasks.Where(f => f.UserId == userId).OrderBy(f => f.Status).ToList();
-            if (data != null)
+            if (data.Any())
             {
                 return Ok(data);
             }
@@ -165,53 +165,53 @@ namespace TaskManagerAPI.Controllers
             });
         }
 
-        [HttpPut("{id}/Apply")]
+        [HttpPost("{id}/Apply")]
         [Authorize(Policy = "ManagerOrUser")]
         public ActionResult Apply(int id)
         {
             int userId = GetUserID();
-            var tasks = _context.Tasks.Where(f => f.UserId == userId);
+            var tasks = _context.Tasks.Where(f => f.Status == "Pending").ToList();
 
-            var data = tasks.FirstOrDefault(f => f.Id == id);
-            if (data != null)
+            if (tasks.Any())
             {
-                if (data.Status == "Completed")
+                var data = tasks.FirstOrDefault(f => f.Id == id);
+                if (data != null)
                 {
-                    return Conflict(new
+                    if (data!.UserId != null)
                     {
-                        statusCode = StatusCodes.Status409Conflict,
-                        message = "Task is Completed"
-                    });
+                        return Conflict(new
+                        {
+                            statusCode = StatusCodes.Status409Conflict,
+                            message = "Task is already taken"
+                        });
+                    }
+                    else
+                    {
+                        data.UserId = userId;
+                        data.Status = "Progress";
+                        //_context.Update(data);
+                        //_context.SaveChanges();
+                        return Ok(new
+                        {
+                            statusCode = StatusCodes.Status200OK,
+                            message = "Task Applied Successfully"
+                        });
+                    } 
                 }
-                else if (data.Status == "Progress")
+                return NotFound(new
                 {
-                    return Conflict(new
-                    {
-                        statusCode = StatusCodes.Status409Conflict,
-                        message = "Task is in Progress"
-                    });
-                }
-                else
-                {
-                    data.Status = "Progress";
-                    //_context.Update(data);
-                    //_context.SaveChanges();
-                    return Ok(new
-                    {
-                        statusCode = StatusCodes.Status200OK,
-                        message = "Task Applied Successfully"
-                    });
-                }
-            }
-            return NotFound(new
+                    statusCode = StatusCodes.Status404NotFound,
+                    message = "Task not found / Task is not Available"
+                });
+            } return NotFound(new
             {
                 statusCode = StatusCodes.Status404NotFound,
-                message = "Task not found / You are not authorized to Apply this Task"
+                message = "No tasks Available"
             });
         }
 
-        [HttpPut("{id}/Complete")]
-        [Authorize(Policy = "ManagerOrUser")]
+        [HttpPost("{id}/Complete")]
+        [Authorize(Policy = "Manager")]
         public ActionResult Complete(int id)
         {
             int userId = GetUserID();

@@ -81,8 +81,8 @@ namespace TaskManagerAPI.Controllers
                 RoleId = 3
             };
 
-            //_context.Users.Add(user);
-            //_context.SaveChanges();
+            _context.Users.Add(user);
+            _context.SaveChanges();
 
             return Ok(new
             {
