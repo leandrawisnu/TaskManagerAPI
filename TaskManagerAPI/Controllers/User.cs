@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using TaskManagerAPI.Models;
 
 namespace TaskManagerAPI.Controllers
@@ -13,7 +14,7 @@ namespace TaskManagerAPI.Controllers
 
         [HttpGet]
         [Authorize(Policy = "AdminOrManager")]
-        public ActionResult All()
+        public ActionResult All([FromQuery] string? search)
         {
             var data = (from User in _context.Users
                         join Role in _context.Roles on User.RoleId equals Role.Id
@@ -24,6 +25,15 @@ namespace TaskManagerAPI.Controllers
                             email = User.Email,
                             role = Role.Name
                         }).ToList();
+            if (!search.IsNullOrEmpty())
+            {
+                data = data.Where(f => f.name.Contains(search!) || f.email.Contains(search!) || f.role.Contains(search!)).ToList();
+                return Ok(new
+                {
+                    statusCode = StatusCodes.Status200OK,
+                    data = data
+                });
+            }
             if (data != null)
             {
                 return Ok(new

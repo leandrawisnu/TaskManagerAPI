@@ -12,8 +12,6 @@ namespace TaskManagerAPI
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]!));
 
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
                 Subject = new ClaimsIdentity(
@@ -23,13 +21,13 @@ namespace TaskManagerAPI
                         new Claim(ClaimTypes.Email, user.Email),
                         new Claim(ClaimTypes.Role, user.RoleId.ToString()),
                     ]),
-                SigningCredentials = credentials,
+                SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256),
                 Audience = configuration["JWT:Audience"],
                 Issuer = configuration["JWT:Issuer"],
                 Expires = DateTime.UtcNow.AddHours(1)
             };
 
-            var handler = new JsonWebTokenHandler();
+            JsonWebTokenHandler handler = new JsonWebTokenHandler();
             string token = handler.CreateToken(tokenDescriptor);
 
             return token;
