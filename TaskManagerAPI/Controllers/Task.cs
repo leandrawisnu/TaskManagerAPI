@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using TaskManagerAPI.DTO;
 using TaskManagerAPI.Models;
 
@@ -12,6 +13,7 @@ namespace TaskManagerAPI.Controllers
     public class Task(TaskManagerContext _context) : ControllerBase
     {
         TaskManagerContext _context = _context;
+
         private int GetUserID()
         {
             string header = Request.Headers["Authorization"]!;
@@ -25,11 +27,19 @@ namespace TaskManagerAPI.Controllers
 
         [HttpGet]
         [Authorize]
-        public ActionResult All()
+        public ActionResult All([FromQuery] string? search)
         {
             int userId = GetUserID();
 
             var data = _context.Tasks.Where(f => f.UserId == userId).OrderBy(f => f.Status).ToList();
+            if (!search.IsNullOrEmpty())
+            {
+                if (data.Any())
+                {
+                    data = data.Where(f => f.Title.Contains(search!) || f.Description.Contains(search!)).ToList();
+                    return Ok(data);
+                }
+            }
             if (data.Any())
             {
                 return Ok(data);
@@ -38,6 +48,32 @@ namespace TaskManagerAPI.Controllers
             {
                 statusCode = StatusCodes.Status404NotFound,
                 message = "No tasks found"
+            });
+        }
+
+        [HttpGet("Available")]
+        [Authorize(Policy = "ManagerOrUser")]
+        public ActionResult Available()
+        {
+            var data = _context.Tasks.Where(f => f.Status == "Pending").Select(f => new
+            {
+                id = f.Id,
+                title = f.Title,
+                description = f.Description,
+                createAt = f.CreateAt.ToString("dd-MMM-yyyy hh:mm")
+            }).ToList();
+            if (data.Any())
+            {
+                return Ok(new
+                {
+                    statusCode = StatusCodes.Status200OK,
+                    data = data
+                });
+            }
+            return NotFound(new
+            {
+                statusCode = StatusCodes.Status404NotFound,
+                message = "No tasks Available"
             });
         }
 

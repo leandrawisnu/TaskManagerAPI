@@ -84,6 +84,15 @@
         "tags": [
           "Task"
         ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -113,6 +122,18 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Task/Available": {
+      "get": {
+        "tags": [
+          "Task"
+        ],
         "responses": {
           "200": {
             "description": "OK"
