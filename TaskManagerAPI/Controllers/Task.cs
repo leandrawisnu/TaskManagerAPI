@@ -14,6 +14,27 @@ namespace TaskManagerAPI.Controllers
     {
         TaskManagerContext _context = _context;
 
+        // Rumus Start
+        private int startForm(int x)
+        {
+            int start = (x - 1) * 10;
+            return start;
+        }
+
+        // Rumus Take
+        private int take(int x)
+        {
+            int take;
+            if (x%2 == 0)
+            {
+                take = 9;
+            } else
+            {
+                take = 10;
+            }
+            return take;
+        }
+
         private int GetUserID()
         {
             string header = Request.Headers["Authorization"]!;
@@ -53,9 +74,10 @@ namespace TaskManagerAPI.Controllers
 
         [HttpGet("All")]
         [Authorize(Policy = "Admin")]
-        public ActionResult All()
+        public ActionResult All([FromQuery] int page = 1)
         {
-            var data = _context.Tasks.Where(f => f.Status != "Completed").ToList();
+            var data = _context.Tasks.Where(f => f.Id > startForm(page)).ToList();
+            data = data.Take(take(data.First().Id)).ToList();
             if (data.Any())
             {
                 return Ok(data);
