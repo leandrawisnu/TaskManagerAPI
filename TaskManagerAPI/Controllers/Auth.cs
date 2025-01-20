@@ -21,8 +21,8 @@ namespace TaskManagerAPI.Controllers
             string header = Request.Headers["Authorization"]!;
             string token = header.Substring("Bearer ".Length).Trim();
 
-            var handler = new JsonWebTokenHandler();
-            var id = int.Parse(handler.ReadJsonWebToken(token).Claims.FirstOrDefault(f => f.Type == "UserID")!.Value);
+            JsonWebTokenHandler handler = new JsonWebTokenHandler();
+            int id = int.Parse(handler.ReadJsonWebToken(token).Claims.FirstOrDefault(f => f.Type == "UserID")!.Value);
 
             return id;
         }
@@ -53,12 +53,7 @@ namespace TaskManagerAPI.Controllers
                     message = "Invalid Password"
                 });
             }
-            return Ok(new
-            {
-                statusCode = StatusCodes.Status200OK,
-                token = tokenService.CreateJWT(data),
-                message = "Login Successful"
-            });
+            return Ok(tokenService.CreateJWT(data));
         }
 
         [HttpPost("Register")]

@@ -27,7 +27,7 @@ namespace TaskManagerAPI.Controllers
 
         [HttpGet]
         [Authorize]
-        public ActionResult All([FromQuery] string? search)
+        public ActionResult AllMine([FromQuery] string? search)
         {
             int userId = GetUserID();
 
@@ -40,6 +40,22 @@ namespace TaskManagerAPI.Controllers
                     return Ok(data);
                 }
             }
+            if (data.Any())
+            {
+                return Ok(data);
+            }
+            return NotFound(new
+            {
+                statusCode = StatusCodes.Status404NotFound,
+                message = "No tasks found"
+            });
+        }
+
+        [HttpGet("All")]
+        [Authorize(Policy = "Admin")]
+        public ActionResult All()
+        {
+            var data = _context.Tasks.Where(f => f.Status != "Completed").ToList();
             if (data.Any())
             {
                 return Ok(data);
@@ -270,7 +286,7 @@ namespace TaskManagerAPI.Controllers
                     {
                         statusCode = StatusCodes.Status409Conflict,
                         message = "Task is Pending"
-                    });
+                    }); 
                 }
                 else
                 {
@@ -278,6 +294,11 @@ namespace TaskManagerAPI.Controllers
                     data.DoneAt = DateTime.Now;
                     //_context.Update(data);
                     //_context.SaveChanges();
+                    return NotFound(new
+                    {
+                        statusCode = StatusCodes.Status404NotFound,
+                        message = "Task not found / You are not authorized to Complete this Task"
+                    });
                     return Ok(new
                     {
                         statusCode = StatusCodes.Status200OK,

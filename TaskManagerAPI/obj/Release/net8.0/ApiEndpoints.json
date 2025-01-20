@@ -43,7 +43,7 @@
   },
   {
     "ContainingType": "TaskManagerAPI.Controllers.Task",
-    "Method": "All",
+    "Method": "AllMine",
     "RelativePath": "api/Task",
     "HttpMethod": "GET",
     "IsController": true,
@@ -156,6 +156,16 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TaskManagerAPI.Controllers.Task",
+    "Method": "All",
+    "RelativePath": "api/Task/All",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {

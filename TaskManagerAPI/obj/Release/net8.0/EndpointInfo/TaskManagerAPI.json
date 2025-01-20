@@ -129,6 +129,18 @@
         }
       }
     },
+    "/api/Task/All": {
+      "get": {
+        "tags": [
+          "Task"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Task/Available": {
       "get": {
         "tags": [
