@@ -21,20 +21,6 @@ namespace TaskManagerAPI.Controllers
             return start;
         }
 
-        // Rumus Take
-        private int take(int x)
-        {
-            int take;
-            if (x%2 == 0)
-            {
-                take = 9;
-            } else
-            {
-                take = 10;
-            }
-            return take;
-        }
-
         private int GetUserID()
         {
             string header = Request.Headers["Authorization"]!;
@@ -73,14 +59,27 @@ namespace TaskManagerAPI.Controllers
         }
 
         [HttpGet("All")]
-        [Authorize(Policy = "Admin")]
+        //[Authorize(Policy = "Admin")]
         public ActionResult All([FromQuery] int page = 1)
         {
-            var data = _context.Tasks.Where(f => f.Id > startForm(page)).ToList();
-            data = data.Take(take(data.First().Id)).ToList();
-            if (data.Any())
+            int pages = page * 10;
+
+            if (pages > 10)
             {
-                return Ok(data);
+                var count = _context.Tasks.Take(pages).OrderDescending().ToList();
+                var data = _context.Tasks.Where(f => f.Id > count.First().Id).Take(10).ToList();
+                if (data.Any())
+                {
+                    return Ok(data);
+                }
+            }
+            else
+            {
+                var data = _context.Tasks.Take(10).ToList();
+                if (data.Any())
+                {
+                    return Ok(data);
+                }
             }
             return NotFound(new
             {
