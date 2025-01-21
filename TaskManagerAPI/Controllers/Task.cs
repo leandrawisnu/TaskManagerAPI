@@ -17,7 +17,7 @@ namespace TaskManagerAPI.Controllers
         // Rumus Start
         private int startForm(int x)
         {
-            int start = (x - 1) * 10;
+            int start = (x - 1) * 5;
             return start;
         }
 
@@ -62,25 +62,19 @@ namespace TaskManagerAPI.Controllers
         //[Authorize(Policy = "Admin")]
         public ActionResult All([FromQuery] int page = 1)
         {
-            int pages = page * 10;
+            int size = 5;
 
-            if (pages > 10)
+            var data = _context.Tasks.Skip(startForm(page)).Take(size).ToList();
+
+            if (data.Any())
             {
-                var count = _context.Tasks.Take(pages).OrderDescending().ToList();
-                var data = _context.Tasks.Where(f => f.Id > count.First().Id).Take(10).ToList();
-                if (data.Any())
+                return Ok(new
                 {
-                    return Ok(data);
-                }
+                    statusCode = StatusCodes.Status200OK,
+                    data = data,
+                });
             }
-            else
-            {
-                var data = _context.Tasks.Take(10).ToList();
-                if (data.Any())
-                {
-                    return Ok(data);
-                }
-            }
+
             return NotFound(new
             {
                 statusCode = StatusCodes.Status404NotFound,
@@ -314,12 +308,7 @@ namespace TaskManagerAPI.Controllers
                     data.Status = "Completed";
                     data.DoneAt = DateTime.Now;
                     //_context.Update(data);
-                    //_context.SaveChanges();
-                    return NotFound(new
-                    {
-                        statusCode = StatusCodes.Status404NotFound,
-                        message = "Task not found / You are not authorized to Complete this Task"
-                    });
+                    //_context.SaveChanges);
                     return Ok(new
                     {
                         statusCode = StatusCodes.Status200OK,
